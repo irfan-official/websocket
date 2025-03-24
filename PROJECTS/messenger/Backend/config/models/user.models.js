@@ -1,0 +1,40 @@
+import mongoose from "mongoose";
+
+const userSchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    email: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    password: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    number: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    img: {
+      type: String,
+      default:
+        "https://e7.pngegg.com/pngimages/84/165/png-clipart-united-states-avatar-organization-information-user-avatar-service-computer-wallpaper-thumbnail.png",
+    },
+    message_id: {
+      type: String,
+      default: "",
+    },
+  },
+  { timestamps: true }
+);
+
+const User = mongoose.model("User", userSchema);
+
+export default User;
