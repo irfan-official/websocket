@@ -15,5 +15,8 @@
       "createdAt": "Date",
       "updatedAt": "Date"
     }
+  ],
+  "roomMembers": [
+    { "userName": "", "image": "", "isActive": true, "lastActive": "Date" }
   ]
 }

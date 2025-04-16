@@ -6,14 +6,19 @@ export const roomChat = async (req, res) => {
 
     const { roomType, roomName } = req.body;
 
-    const room = await Room.findOne({ roomName }).populate({
-      path: "messages",
-      select: "-room -receiver",
-      populate: {
-        path: "sender",
-        select: "userName image isActive lastActive",
-      },
-    });
+    const room = await Room.findOne({ roomName })
+      .populate({
+        path: "roomMembers",
+        selsect: "userName image isActive lastActive",
+      })
+      .populate({
+        path: "messages",
+        select: "-room -receiver",
+        populate: {
+          path: "sender",
+          select: "userName image isActive lastActive",
+        },
+      });
 
     if (!room) {
       return res.status(404).json({
@@ -28,6 +33,7 @@ export const roomChat = async (req, res) => {
       roomTitle: room.roomTitle,
       roomPhoto: roomroom.roomPhoto,
       allChats: room.messages,
+      roomMembers: room.roomMembers,
     });
   } catch (error) {
     return res.status(500).json({
@@ -36,3 +42,5 @@ export const roomChat = async (req, res) => {
     });
   }
 };
+
+//"roomMembers": [{ "userName": "", "isActive": true, "lastActive": "Date" }]
