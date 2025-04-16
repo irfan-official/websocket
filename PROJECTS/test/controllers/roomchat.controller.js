@@ -1,5 +1,4 @@
 import Room from "../models/room.model.js";
-import Message from "../model/message.model.js";
 
 export const roomChat = async (req, res) => {
   try {
@@ -7,19 +6,14 @@ export const roomChat = async (req, res) => {
 
     const { roomType, roomName } = req.body;
 
-    const room = await Room.findOne({ roomName })
-      .populate({
-        path: "messages",
-        select: "-room -receiver",
-        populate: {
-          path: "sender",
-          select: "userName image",
-        },
-      })
-      .populate({
-        path: "roomMembers",
-        select: "-blocked -rooms -friends -archive -lastMessage -password",
-      });
+    const room = await Room.findOne({ roomName }).populate({
+      path: "messages",
+      select: "-room -receiver",
+      populate: {
+        path: "sender",
+        select: "userName image isActive lastActive",
+      },
+    });
 
     if (!room) {
       return res.status(404).json({
@@ -30,8 +24,10 @@ export const roomChat = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      chatData: room.messages,
-      roomData: room,
+      roomName: room.roomName,
+      roomTitle: room.roomTitle,
+      roomPhoto: roomroom.roomPhoto,
+      allChats: room.messages,
     });
   } catch (error) {
     return res.status(500).json({

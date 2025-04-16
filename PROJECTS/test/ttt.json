@@ -1,5 +1,19 @@
-
-
-
-
-
+{
+  "success": true,
+  "roomName": "",
+  "roomTitle": ["", ""],
+  "roomPhoto": [{ "userID": "", "image": " " }, {}],
+  "allChats": [
+    {
+      "sender": {
+        "userName": "",
+        "image": "",
+        "isActive": true,
+        "lastActive": ""
+      },
+      "message": "",
+      "createdAt": "Date",
+      "updatedAt": "Date"
+    }
+  ]
+}
