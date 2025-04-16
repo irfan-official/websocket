@@ -54,13 +54,25 @@ const userSchema = new mongoose.Schema(
         ref: "User",
       },
     ],
-
     rooms: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Room",
       },
     ],
+    friendRequests: [
+      {
+        from: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "User",
+        },
+        sentAt: {
+          type: Date,
+          default: Date.now,
+        },
+      },
+    ],
+
     friends: [
       {
         type: mongoose.Schema.Types.ObjectId,
