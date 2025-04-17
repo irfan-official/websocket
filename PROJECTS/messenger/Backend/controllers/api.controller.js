@@ -77,26 +77,3 @@ export const handleRegister = async (req, res) => {
     });
   }
 };
-
-export const handleGetUserData = async (req, res) => {
-  try {
-    const { email = "", userID = "" } = req.body;
-    const user = await User.findOne({ _id: userID });
-    if (!user) {
-      return res.status(400).json({
-        success: false,
-        message: "User not found",
-      });
-    }
-    return res.status(200).json({
-      success: true,
-      message: "User not found",
-      data: user.img,
-    });
-  } catch (error) {
-    return res.status(500).json({
-      success: false,
-      message: "Internal server error",
-    });
-  }
-};
