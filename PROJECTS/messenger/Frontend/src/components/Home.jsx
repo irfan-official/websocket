@@ -41,7 +41,14 @@ function Home() {
     []
   );
 
-  let [roomName, setRoomName] = useState("funny");
+  let [roomName, setRoomName] = useState("");
+
+  useEffect(() => {
+    if (!roomName) {
+      const name = prompt("Enter the room name");
+      setRoomName(name);
+    }
+  }, []);
 
   useEffect(() => {
     socket.emit("register", {
