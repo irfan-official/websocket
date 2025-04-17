@@ -2,35 +2,32 @@ import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema(
   {
-    name: {
+    userName: {
       type: String,
       required: true,
       trim: true,
     },
-    email: {
+    userEmail: {
       type: String,
       required: true,
       trim: true,
     },
-    password: {
+    userPassword: {
       type: String,
       required: true,
       trim: true,
     },
-    number: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-    img: {
+    userImage: {
       type: String,
       default:
         "https://e7.pngegg.com/pngimages/84/165/png-clipart-united-states-avatar-organization-information-user-avatar-service-computer-wallpaper-thumbnail.png",
     },
-    message_id: {
-      type: String,
-      default: "",
-    },
+    userAllMessages: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Message",
+      },
+    ],
   },
   { timestamps: true }
 );
