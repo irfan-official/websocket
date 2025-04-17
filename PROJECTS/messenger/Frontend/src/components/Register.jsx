@@ -2,34 +2,48 @@ import React from "react";
 import { useState, useEffect, useMemo } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-function Register({ setUserEmail, setUserImg }) {
+function Register() {
   const Navigate = useNavigate();
 
   let [name, setName] = useState("");
   let [email, setEmail] = useState("");
-  let [number, setNumber] = useState("");
   let [password, setPassword] = useState("");
   let [img, setImg] = useState("");
 
   async function handleSubmit(e) {
     e.preventDefault();
-    if (!name || !email || !number || !password || !img) {
+    if (!name || !email || !password || !img) {
       alert("please submit form data");
       return;
     }
 
     try {
-      setUserImg(img);
-      let obj = { name, email, number, password, message_id: "", img };
+      let obj = {
+        userName: name,
+        userEmail: email,
+        userPassword: password,
+        userImage: img,
+      };
 
-      await axios.post("http://localhost:3000/api/register", obj, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      console.log(obj);
-      setUserEmail(email);
-      Navigate("/home");
+      let response = await axios.post(
+        "http://localhost:3000/api/register",
+        obj,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      console.log("data of requested ====>", response);
+
+      if (!response.data.success) {
+        alert(response.data.error);
+        Navigate("/register");
+      } else {
+        localStorage.setItem("user", JSON.stringify(response.data.data));
+        Navigate("/home");
+      }
     } catch (err) {
       console.log("Login error =>", err);
       alert("Invalid login credentials. Please try again.");
@@ -57,13 +71,6 @@ function Register({ setUserEmail, setUserImg }) {
             className="px-3 py-3 rounded-md bg-slate-900 w-7/12"
             type="email"
             placeholder="email"
-          />
-          <input
-            onChange={(e) => setNumber(e.target.value)}
-            value={number}
-            className="px-3 py-3 rounded-md bg-slate-900 w-7/12"
-            type="text"
-            placeholder="phone number"
           />
           <input
             onChange={(e) => setPassword(e.target.value)}

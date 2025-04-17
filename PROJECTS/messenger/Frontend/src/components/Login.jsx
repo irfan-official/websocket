@@ -3,7 +3,7 @@ import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 
 import axios from "axios";
-function Login({ setUserEmail, setUserImg }) {
+function Login() {
   let [email, setEmail] = useState("");
   let [password, setPassword] = useState("");
 
@@ -15,15 +15,29 @@ function Login({ setUserEmail, setUserImg }) {
       alert("Please submit form data");
       return;
     }
-
+    // response.data.img
     try {
-      let obj = { email, password };
-      console.log(obj);
-      let response = await axios.post("http://localhost:3000/api/login", obj);
-      console.log("data ===> ", response);
-      setUserEmail(email);
-      setUserImg(response.data.img);
-      Navigate("/home");
+      let response = await axios.post("http://localhost:3000/api/login", {
+        userEmail: email,
+        userPassword: password,
+      });
+
+      // response.data = {
+      //   userID: "",
+      //   userName: "",
+      //   userImg: "",
+      // };
+
+      console.log(`response ===> ${response}`);
+
+      if (!response.data.success) {
+        alert(response.data.error);
+        Navigate("/login");
+      } else {
+        // set the response to the localstorage or indexDB
+        localStorage.setItem("user", JSON.stringify(response.data.data));
+        Navigate("/home");
+      }
     } catch (err) {
       console.log("Login error =>", err);
       alert("Invalid login credentials. Please try again.");

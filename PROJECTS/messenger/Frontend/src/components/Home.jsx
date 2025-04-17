@@ -1,7 +1,38 @@
 import React from "react";
 import { useState, useEffect, useRef, useMemo } from "react";
 import { io } from "socket.io-client";
-function Home({ userEmail, img }) {
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+
+// response.data = userData = {
+//   roomName: ""
+//   userID: "",
+//   userName: "",
+//   userImg: "",
+// };
+
+function Home() {
+  const Navigate = useNavigate();
+
+  useEffect(() => {
+    const check = JSON.parse(localStorage.getItem("user"));
+    if (!check) {
+      return Navigate("/");
+    }
+  }, []);
+
+  let [userData, setUserData] = useState(
+    JSON.parse(localStorage.getItem("user")) || ""
+  );
+
+  if (!userData) {
+    try {
+      setUserData(JSON.parse(localStorage.getItem("user")));
+    } catch (error) {
+      alert(error.message);
+    }
+  }
+
   const socket = useMemo(
     () =>
       io("http://localhost:3000", {
@@ -9,24 +40,51 @@ function Home({ userEmail, img }) {
       }),
     []
   );
+
+  let [roomName, setRoomName] = useState("funny");
+
+  useEffect(() => {
+    socket.emit("register", {
+      roomName,
+    });
+  }, [roomName]);
+
   let [scrollBehave, setScrollBehave] = useState("auto");
 
   let [clientMessage, setClientMessage] = useState("");
 
   let [allMessages, setAllMessages] = useState([
-    // { c: "client message 1" },
-    // { s: "server message 1" },
+    /* follows the messages schemas
+    {
+      sender: {
+        _id: userData.userID,
+        userName: "",
+        userImage: "",
+      },
+      message: "senderMessage",
+    },
+     */
   ]);
+
+  useEffect(() => {
+    socket.on("allMessages", (data) => {
+      setAllMessages(data);
+    });
+  });
+
+  const obj = [
+    {
+      sender: {
+        _id: userData.userID,
+        userName: "",
+        userImage: "",
+      },
+      message: "senderMessage",
+    },
+  ];
 
   //let behave = "smooth"
   const scrollRef = useRef(null);
-
-  useEffect(() => {
-    socket.emit("register", {
-      socketID: socket.id,
-      email: userEmail,
-    });
-  }, []);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({
@@ -37,26 +95,23 @@ function Home({ userEmail, img }) {
 
   useEffect(() => {
     socket.on("reply", (data) => {
-      console.log("Reply from server:", data);
-      setAllMessages((messages) => [...messages, { s: data }]);
+      console.log("data ===> ", data);
+      setAllMessages((messages) => [...messages, data]);
     });
+    return () => socket.off("reply");
   }, []);
 
   function handleSubmit(e) {
     e.preventDefault();
     if (!clientMessage) return;
     if (clientMessage.length <= 200) {
-      let obj = {
-        message: clientMessage,
-      };
-      //console.log(obj);
-
       setScrollBehave("smooth");
-      socket.emit("message", clientMessage);
-      setAllMessages((prev) => [...prev, { c: clientMessage }]);
+      socket.emit("message", {
+        senderID: userData.userID,
+        message: clientMessage,
+        roomName: roomName,
+      });
       setClientMessage("");
-    } else {
-      return;
     }
   }
 
@@ -74,29 +129,34 @@ function Home({ userEmail, img }) {
                 <div
                   key={idx}
                   className={`w-full min-h-[3rem] px-1 py-1 flex relative ${
-                    msg.c ? "justify-start" : "justify-end"
+                    /* msg.c */ userData.userID === msg.sender._id
+                      ? "justify-start"
+                      : "justify-end"
                   } flex-wrap overflow-hidden`}
                 >
                   <p
                     className={`${
-                      msg.c ? "bg-blue-600" : "bg-violet-600"
+                      /* msg.c */ userData.userID === msg.sender._id
+                        ? "bg-blue-600"
+                        : "bg-violet-600"
                     } px-2  py-2 rounded-tl-sm rounded-tr-xl rounded-bl-xl rounded-br-sm inline-flex flex-wrap text-pretty items-center mb-1`}
                   >
-                    {msg.c || msg.s}
+                    {msg.message}
                   </p>
-                  {msg.s ? (
-                    <img
-                      className="w-[15px] object-cover rounded-full absolute right-0 bottom-0 z-50"
-                      src={`${img}`}
-                      alt=""
-                    />
-                  ) : (
-                    ""
-                  )}
+                  {
+                    /* msg.c */ userData.userID != msg.sender._id ? (
+                      <img
+                        className="w-[15px] object-cover rounded-full absolute right-0 bottom-0 z-50"
+                        src={msg.sender.userImage}
+                        alt=""
+                      />
+                    ) : (
+                      ""
+                    )
+                  }
                 </div>
               );
             })}
-            {/* {clientMessage ? <span>...</span> : ""} */}
           </div>
         </div>
         <form
@@ -105,7 +165,7 @@ function Home({ userEmail, img }) {
         >
           <input
             onChange={(e) => {
-              socket.emit("typeing");
+              //socket.emit("typeing");
               setClientMessage(e.target.value);
             }}
             value={clientMessage}
@@ -113,6 +173,7 @@ function Home({ userEmail, img }) {
             type="text"
             placeholder="message"
           />
+
           <button
             onClick={() => {
               setClientMessage((prev) => {
