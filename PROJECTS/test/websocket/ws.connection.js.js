@@ -1,7 +1,7 @@
 const { Server } = require("socket.io");
 
-const stablishSocketConnection = (server) => {
-  const io = new Server(server, {
+const stablishSocketConnection = (httpServer) => {
+  const io = new Server(httpServer, {
     cors: {
       origin: "http://localhost:51733", // React frontend
       methods: ["GET", "POST"],
