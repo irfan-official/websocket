@@ -6,20 +6,24 @@ const handleSocket = (socket, io) => {
   console.log(`connected ${socket.id}`);
 
   socket.on("register", async (data) => {
-    socket.join(data.roomName);
+    try {
+      socket.join(data.roomName);
+      const response = await Room.findOne({ roomName: data.roomName })
+        .populate({
+          path: "allMessages",
+          select: "-receiver -_id",
+          populate: {
+            path: "sender",
+            select: "_id userName userImage",
+          },
+        })
+        .select("allMessages");
 
-    const response = await Room.findOne({ roomName: data.roomName })
-      .populate({
-        path: "allMessages",
-        select: "-receiver -_id",
-        populate: {
-          path: "sender",
-          select: "_id userName userImage",
-        },
-      })
-      .select("allMessages");
-
-    socket.emit("allMessages", response?.allMessages || []);
+      socket.emit("allMessages", response?.allMessages || []);
+    } catch (err) {
+      console.error("Error during register:", err);
+      socket.emit("error", { message: "Failed to register room." });
+    }
   });
 
   socket.on("message", async (data) => {
@@ -67,7 +71,7 @@ const handleSocket = (socket, io) => {
 export default handleSocket;
 
 /*{  // responses
-  _id: "ROOM_OBJECT_ID", // this remains because you didn't exclude it from Room
+  _id: "ROOM_OBJECT_ID",
   allMessages: [
     {
       message: "Hello there!",
