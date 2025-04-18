@@ -2,6 +2,8 @@ import React from "react";
 import { useState, useEffect, useMemo } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { NavLink } from "react-router-dom";
+
 function Register() {
   const Navigate = useNavigate();
 
@@ -35,7 +37,7 @@ function Register() {
         }
       );
 
-      console.log("data of requested ====>", response);
+      // console.log("data of requested ====>", response);
 
       if (!response.data.success) {
         alert(response.data.error);
@@ -93,6 +95,9 @@ function Register() {
             Submit
           </button>
         </form>
+        <NavLink className={"text-violet-500 hover:text-violet-800"} to={"/"}>
+          Already have an account, please Login
+        </NavLink>
       </div>
     </div>
   );

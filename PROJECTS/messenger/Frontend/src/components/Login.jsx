@@ -1,6 +1,7 @@
 import React from "react";
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 
 import axios from "axios";
 function Login() {
@@ -25,7 +26,7 @@ function Login() {
       // response.data = {
       //   userID: "",
       //   userName: "",
-      //   userImg: "",
+      //   userImage: "",
       // };
 
       console.log(`response ===> ${response}`);
@@ -73,6 +74,12 @@ function Login() {
             Login
           </button>
         </form>
+        <NavLink
+          className={"text-violet-500 hover:text-violet-800"}
+          to={"/register"}
+        >
+          Dont have any account, please Register
+        </NavLink>
       </div>
     </div>
   );

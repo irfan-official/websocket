@@ -48,6 +48,9 @@ function Home() {
       const name = prompt("Enter the room name");
       setRoomName(name);
     }
+    socket.on("error", (data) => {
+      alert(data.message);
+    });
   }, []);
 
   useEffect(() => {
@@ -79,7 +82,7 @@ function Home() {
     });
   });
 
-  const obj = [
+  /* onst obj = [
     {
       sender: {
         _id: userData.userID,
@@ -88,7 +91,7 @@ function Home() {
       },
       message: "senderMessage",
     },
-  ];
+  ]; */
 
   //let behave = "smooth"
   const scrollRef = useRef(null);
@@ -102,7 +105,7 @@ function Home() {
 
   useEffect(() => {
     socket.on("reply", (data) => {
-      console.log("data ===> ", data);
+      // console.log("data ===> ", data);
       setAllMessages((messages) => [...messages, data]);
     });
     return () => socket.off("reply");
