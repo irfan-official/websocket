@@ -73,6 +73,12 @@ const handleSocket = (socket, io) => {
     };
 
     io.to(data.roomName).emit("reply", replyData);
+
+    io.emit("latestMessage", {
+      roomName: roomName,
+      message: message,
+      time: saveMessage.createdAt,
+    });
   });
 
   socket.on("disconnect", () => {

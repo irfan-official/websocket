@@ -32,7 +32,8 @@ function App() {
     roomTitle: "",
   });
 
-  const [sidebarWidth, setSidebarWidth] = useState(400);
+  let [roomCardCreationTime, setLastClickToRoomCard] = useState(Date.now());
+  const [sidebarWidth, setSidebarWidth] = useState(320);
   const isDragging = useRef(false);
   const startX = useRef(0);
   const startWidth = useRef(0);
@@ -97,7 +98,6 @@ function App() {
       // await addUserData(data.rooms);
     });
   }, []);
-
 
   function Roomfinder() {
     return (
@@ -167,6 +167,9 @@ function App() {
                     setClick={setClick}
                     roomType={data.roomType}
                     roomName={data.roomName}
+                    socket={socket}
+                    click={click}
+                    roomCardCreationTime={roomCardCreationTime}
                     roomPhoto={
                       data.roomPhoto.length > 1
                         ? data.roomPhoto.find(
@@ -181,8 +184,14 @@ function App() {
                             .join(", ")
                         : data.roomTitle || ""
                     }
-                    timeStamps={"1/1/1"}
-                    unseenMessage="unknown"
+                    timeStamps={
+                      new Date(
+                        data?.messages[data?.messages.length - 1]?.createdAt
+                      ) || data.createdAt
+                    }
+                    unseenMessage={
+                      data?.messages[data?.messages.length - 1]?.message || ""
+                    }
                   />
                 );
               })
@@ -213,11 +222,13 @@ function App() {
             <RoomMessage
               userID={userData.userID}
               socket={socket}
+              click={click}
               messages={Roomfinder().messages}
               roomType={click.roomType}
               roomName={click.roomName}
               roomPhoto={click.roomPhoto}
               roomTitle={click.roomTitle}
+              setLastClickToRoomCard={setLastClickToRoomCard}
             />
           ) : (
             <h1>welcome user</h1>

@@ -79,7 +79,7 @@ export const handleRegister = async (req, res) => {
   }
 };
 
-export const handleJoinRoom = async (req, res) => {
+export const handleCreateRoom = async (req, res) => {
   try {
     const { userID, roomType, roomName, roomTitle, roomPhoto } = req.body;
 
@@ -119,6 +119,55 @@ export const handleJoinRoom = async (req, res) => {
       // Add room to user's list
       user.rooms.push(room._id);
       await user.save();
+    } else {
+      // Room already exists - check if user is in it
+      if (!existingRoom.roomMembers.includes(userID)) {
+        existingRoom.roomMembers.push(userID);
+        await existingRoom.save();
+
+        user.rooms.push(existingRoom._id);
+        await user.save();
+      }
+
+      room = existingRoom;
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Room joined successfully",
+      room,
+    });
+  } catch (error) {
+    console.error("Join room error:", error);
+    res.status(500).json({ success: false, error: "Server error" });
+  }
+};
+
+export const handleJoinRoom = async (req, res) => {
+  try {
+    const { userID, roomName } = req.body;
+
+    // Validate fields
+    if (!userID || !roomName) {
+      return res
+        .status(400)
+        .json({ success: false, error: "Please fill all required fields" });
+    }
+
+    const user = await User.findById(userID);
+    if (!user) {
+      return res.status(404).json({ success: false, error: "User not found" });
+    }
+
+    let existingRoom = await Room.findOne({ roomName });
+
+    let room;
+
+    if (!existingRoom) {
+      // Create new room
+      return res
+        .status(500)
+        .json({ success: false, error: "No room found, please create a room" });
     } else {
       // Room already exists - check if user is in it
       if (!existingRoom.roomMembers.includes(userID)) {

@@ -6,6 +6,7 @@ import Register from "./components/Register.jsx";
 import "./index.css";
 import App from "./App.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
+import CreateRoom from "./components/CreateRoom.jsx";
 import JoinRoom from "./components/JoinRoom.jsx";
 
 createRoot(document.getElementById("root")).render(
@@ -16,6 +17,14 @@ createRoot(document.getElementById("root")).render(
         element={
           <ProtectedRoute>
             <App />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/create"
+        element={
+          <ProtectedRoute>
+            <CreateRoom />
           </ProtectedRoute>
         }
       />

@@ -4,16 +4,29 @@ import { useState, useEffect, useRef, useMemo } from "react";
 function RoomMessage({
   userID,
   socket,
+  click,
   messages,
   roomType,
   roomName,
   roomPhoto,
   roomTitle,
+  setLastClickToRoomCard,
 }) {
   let [scrollBehave, setScrollBehave] = useState("auto");
   let [clientMessage, setClientMessage] = useState("");
   let [allMessages, setAllMessages] = useState([]);
   let [replyServerMessages, setReplyServerMessages] = useState([]);
+
+  const [options] = useState({
+    year: "numeric",
+    month: "numeric",
+    day: "numeric",
+    hour: "numeric",
+    minute: "numeric",
+    second: "numeric",
+    hour12: true,
+  });
+
   //let behave = "smooth"
   const scrollRef = useRef(null);
 
@@ -23,7 +36,8 @@ function RoomMessage({
       roomName,
     };
     socket.emit("roomEnter", data);
-  }, []);
+    setLastClickToRoomCard(Date.now());
+  }, [click]);
 
   useEffect(() => {
     setAllMessages(replyServerMessages || messages);
@@ -62,17 +76,20 @@ function RoomMessage({
         message: clientMessage,
       };
       socket.emit("message", data);
-      // setAllMessages((messages) => [...messages, data]);
       setClientMessage("");
     }
+  }
+
+  function normalizeDate(date) {
+    return new Date(date).toLocaleString("en-US", options);
   }
 
   return (
     <>
       <div className="h-full w-full  rounded-lg p-4 flex flex-col gap-1">
         <div className="header w-full h-24 rounded-lg bg-gray-900 flex items-center pl-10">
-          <div className="rounded-full w-[62px] h-[62px] bg-amber-100 ">
-            <img src={roomPhoto} alt="image" />
+          <div className="rounded-full w-[62px] h-[62px] bg-amber-100 overflow-clip object-center">
+            <img className="object-center" src={roomPhoto} alt="image" />
           </div>
         </div>
         <div className=" message_show bg-gray-900 w-full h-[91%] rounded-lg flex items-center justify-center">
@@ -83,7 +100,6 @@ function RoomMessage({
             >
               <div className="mt-auto flex flex-col gap-5">
                 {allMessages.map((msg, idx) => {
-                  // checkscrollBehave(idx);
                   return (
                     <div
                       key={idx}
@@ -118,7 +134,7 @@ function RoomMessage({
                           {userID != msg.sender._id ? (
                             <div className="ml-1 flex gap-7">
                               <h6>{msg.sender.userName}</h6>
-                              <h6>1/1/1</h6>
+                              <h6>{normalizeDate(msg.createdAt) || "1/1/1"}</h6>
                             </div>
                           ) : (
                             ""
