@@ -98,7 +98,7 @@ function RoomCard({
       className="w-full h-20 bg-slate-900 border-b-2 border-b-slate-500 flex rounded-lg overflow-hidden container"
     >
       <div className="space_div w-[8px] h-full flex items-center ml-1.5">
-        <div className="w-full h-[10%] bg-lime-500 rounded-full"></div>
+        <div className="w-full h-[35%] bg-lime-500 rounded-full"></div>
       </div>
       <div className="room_photo pl-1.5 w-[97px] h-full flex items-center justify-center relative">
         <div className="room_metadata w-[57px] h-[57px] bg-black rounded-full overflow-clip">
@@ -106,9 +106,9 @@ function RoomCard({
         </div>
       </div>
       <div className="room_info h-full w-[75%]">
-        <div className="top_ w-full h-[54%] b flex">
+        <div className="top_ w-full h-[54%] b flex items-center">
           <div className="name h-full w-[75%] px-2 py-2">
-            <h1 className="text-[1.3rem]">{roomTitle}</h1>
+            <h1 className="text-[18px]">{roomTitle}</h1>
           </div>
           <div
             className={`time flex items-center w-[25%] h-[90%] justify-center ${
@@ -131,6 +131,9 @@ function RoomCard({
             {editMessage(latestMessage)}
           </h5>
         </div>
+      </div>
+      <div className="w-[px] h-full  flex items-start m-[6px]">
+        <div className="w-[7px] h-[7px] rounded-full bg-orange-500"></div>
       </div>
     </div>
   );

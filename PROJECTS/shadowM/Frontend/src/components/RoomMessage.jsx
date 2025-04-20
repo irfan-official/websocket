@@ -103,38 +103,45 @@ function RoomMessage({
                   return (
                     <div
                       key={idx}
-                      className={`w-full min-h-[3rem] px-5 py-1 flex relative ${
+                      className={`w-full min-h-[3rem] px-5 py-1 flex relative  ${
                         /* msg.c */ userID === msg.sender._id
                           ? "justify-end"
                           : "justify-start"
                       } flex-wrap overflow-hidden`}
                     >
                       <div className="flex gap-1 items-end ">
-                        {
-                          /* msg.c */ userID != msg.sender._id ? (
-                            <img
-                              className="w-[30px] h-[30px] rounded-full object-cover"
-                              src={msg.sender.userImage}
-                              alt=""
-                            />
-                          ) : (
-                            ""
-                          )
-                        }
                         <div className="flex flex-col gap-[2pxc]">
-                          <p
-                            className={`${
-                              /* msg.c */ userID === msg.sender._id
-                                ? "bg-blue-600"
-                                : "bg-violet-600"
-                            } px-3  pt-3 pb-2 text-[1.2rem] rounded-tl-sm rounded-tr-xl rounded-bl-xl rounded-br-sm inline-flex flex-wrap text-pretty items-center mb-1`}
-                          >
-                            <h6>{msg.message}</h6>
-                          </p>
+                          <div className="top_div flex items-end gap-2 ">
+                            {
+                              /* msg.c */ userID != msg.sender._id ? (
+                                <img
+                                  className="w-[30px] h-[30px] rounded-full object-cover"
+                                  src={msg.sender.userImage}
+                                  alt=""
+                                />
+                              ) : (
+                                ""
+                              )
+                            }
+                            <p
+                              className={`${
+                                /* msg.c */ userID === msg.sender._id
+                                  ? "bg-blue-600"
+                                  : "bg-violet-600"
+                              } px-3  pt-3 pb-2 text-[1.2rem] rounded-tl-sm rounded-tr-xl rounded-bl-xl rounded-br-sm inline-flex flex-wrap text-pretty items-center `}
+                            >
+                              <h6>{msg.message}</h6>
+                            </p>
+                          </div>
+
                           {userID != msg.sender._id ? (
-                            <div className="ml-1 flex gap-7">
-                              <h6>{msg.sender.userName}</h6>
-                              <h6>{normalizeDate(msg.createdAt) || "1/1/1"}</h6>
+                            <div className=" flex gap-7  items-center">
+                              <h6 className="text-[1rem] font-semibold">
+                                {msg.sender.userName}
+                              </h6>
+                              <h6 className="text-[0.6rem]">
+                                {normalizeDate(msg.createdAt) || "1/1/1"}
+                              </h6>
                             </div>
                           ) : (
                             ""
