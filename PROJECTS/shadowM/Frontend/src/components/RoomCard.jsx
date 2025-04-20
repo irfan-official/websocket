@@ -1,4 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import {
+  editMessage,
+  findClickStatus,
+  findRoomName,
+  formatTime,
+  isNewerMessage,
+} from "../../utils/RoomCard.utils.js";
 
 function RoomCard({
   socket,
@@ -12,39 +19,16 @@ function RoomCard({
   unseenMessage,
   roomCardCreationTime,
 }) {
-  function editMessage(message) {
-    let str = "";
-    if (message.length > 23) {
-      let count = 0;
-      for (let c of message) {
-        str += c;
-        if (count === 25) {
-          str += "...";
-          return str;
-        }
-        count++;
-      }
-    }
-    return message;
-  }
-
-  const [TimeOptions] = useState({
-    hour: "numeric",
-    minute: "numeric",
-    hour12: true,
-  });
-
-  function findClickStatus(prevData) {
-    return prevData.roomName === roomName ? !prevData.clickStatus : true;
-  }
-
-  function findRoomName(prevData) {
-    return prevData.roomName === roomName ? !prevData.roomName : roomName;
-  }
-
   const [latestMessage, setLatestMessage] = useState(unseenMessage);
   const [displayCurrentMessageTime, setDisplayCurrentMessageTime] =
     useState(timeStamps);
+
+  const isNewer = isNewerMessage(
+    click,
+    roomName,
+    roomCardCreationTime,
+    displayCurrentMessageTime
+  );
 
   useEffect(() => {
     socket.on("latestMessage", (data) => {
@@ -55,41 +39,13 @@ function RoomCard({
     });
   }, []);
 
-  // ✅ Safely format time for display
-  function formatTime(dateValue) {
-    try {
-      return new Date(dateValue).toLocaleString("en-US", TimeOptions);
-    } catch {
-      return "";
-    }
-  }
-
-  // ✅ Safely compare timestamps
-  function isNewerMessage(creationTime, messageTime) {
-    try {
-      if (roomName !== click.roomName) {
-        return (
-          new Date(creationTime).getTime() < new Date(messageTime).getTime()
-        );
-      }
-      return false;
-    } catch {
-      return false;
-    }
-  }
-
-  const isNewer = isNewerMessage(
-    roomCardCreationTime,
-    displayCurrentMessageTime
-  );
-
   return (
     <div
       onClick={() =>
         setClick((prevData) => ({
-          clickStatus: findClickStatus(prevData),
+          clickStatus: findClickStatus(prevData, roomName),
           roomType: roomType,
-          roomName: findRoomName(prevData),
+          roomName: findRoomName(prevData, roomName),
           roomPhoto: roomPhoto,
           roomTitle: roomTitle,
         }))

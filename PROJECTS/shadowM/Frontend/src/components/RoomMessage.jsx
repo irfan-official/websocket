@@ -1,5 +1,9 @@
 import React from "react";
 import { useState, useEffect, useRef, useMemo } from "react";
+import {
+  formateMessage,
+  normalizeDate,
+} from "../../utils/RoomMessage.utils.js";
 
 function RoomMessage({
   userID,
@@ -16,16 +20,6 @@ function RoomMessage({
   let [clientMessage, setClientMessage] = useState("");
   let [allMessages, setAllMessages] = useState([]);
   let [replyServerMessages, setReplyServerMessages] = useState([]);
-
-  const [options] = useState({
-    year: "numeric",
-    month: "numeric",
-    day: "numeric",
-    hour: "numeric",
-    minute: "numeric",
-    second: "numeric",
-    hour12: true,
-  });
 
   //let behave = "smooth"
   const scrollRef = useRef(null);
@@ -78,10 +72,6 @@ function RoomMessage({
       socket.emit("message", data);
       setClientMessage("");
     }
-  }
-
-  function normalizeDate(date) {
-    return new Date(date).toLocaleString("en-US", options);
   }
 
   return (
@@ -171,26 +161,9 @@ function RoomMessage({
 
               <button
                 onClick={() => {
-                  setClientMessage((prev) => {
-                    let msg = prev.trim();
-                    if (msg.length > 200) {
-                      alert("you can not write message more than 200 words");
-                    }
-                    if (msg.length > 25) {
-                      let str = "";
-                      let lengthCount = 0;
-                      for (let c of msg) {
-                        ++lengthCount;
-                        str += c;
-                        if (lengthCount === 25) {
-                          str += "\n";
-                          lengthCount = 0;
-                        }
-                      }
-                      msg = str;
-                    }
-                    return msg;
-                  });
+                  setClientMessage((previousMessage) =>
+                    formateMessage(previousMessage)
+                  );
                 }}
                 type="submit"
                 className="w-[10%] h-full text-center px-2 py-2 rounded-lg bg-black text-white border-2 border-slate-500"

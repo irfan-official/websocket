@@ -1,9 +1,18 @@
 import React, { useRef, useState, useEffect, useMemo } from "react";
 import RoomCard from "./components/RoomCard";
 import RoomMessage from "./components/RoomMessage";
-import { addUserData, getAllUserData } from "../utils/db.js";
+// import { addUserData, getAllUserData } from "../utils/db.js";
 import { useNavigate } from "react-router-dom";
 import { io } from "socket.io-client";
+
+import {
+  Roomfinder,
+  RoomTitleFinder,
+  RoomPhotoFinder,
+  TimeFinder,
+  UnseenMessageFinder,
+  startDragging,
+} from "../utils/App.utils.js";
 
 function App() {
   const Navigate = useNavigate();
@@ -38,36 +47,6 @@ function App() {
   const startX = useRef(0);
   const startWidth = useRef(0);
 
-  const startDragging = (e) => {
-    isDragging.current = true;
-    startX.current = e.clientX;
-    startWidth.current = sidebarWidth;
-
-    document.addEventListener("mousemove", handleMouseMove);
-    document.addEventListener("mouseup", stopDragging);
-  };
-
-  const handleMouseMove = (e) => {
-    if (!isDragging.current) return;
-
-    const deltaX = e.clientX - startX.current;
-    const newWidth = Math.min(Math.max(startWidth.current + deltaX, 300), 500);
-    setSidebarWidth(newWidth);
-  };
-
-  const stopDragging = () => {
-    isDragging.current = false;
-    document.removeEventListener("mousemove", handleMouseMove);
-    document.removeEventListener("mouseup", stopDragging);
-  };
-
-  useEffect(() => {
-    return () => {
-      document.removeEventListener("mousemove", handleMouseMove);
-      document.removeEventListener("mouseup", stopDragging);
-    };
-  }, []);
-
   const socket = useMemo(
     () =>
       io("http://localhost:3000", {
@@ -95,42 +74,8 @@ function App() {
         ...data,
         rooms: data.rooms || [],
       });
-      // await addUserData(data.rooms);
     });
   }, []);
-
-  function Roomfinder() {
-    return (
-      userHistory.rooms?.find(
-        (objData) => click.roomName === objData.roomName
-      ) || {}
-    );
-  }
-
-  function RoomTitle() {
-    const room = userHistory.rooms?.find((r) => r.roomName === click.roomName);
-    if (!room || !Array.isArray(room.roomTitle)) return "";
-
-    if (room.roomTitle.length > 1) {
-      return room.roomTitle.filter((title) => title !== userData.userName);
-    } else {
-      return room.roomTitle[0] || "";
-    }
-  }
-
-  function RoomPhoto() {
-    const room = userHistory.rooms?.find((r) => r.roomName === click.roomName);
-    if (!room || !Array.isArray(room.roomPhoto)) return "";
-
-    if (room.roomPhoto.length > 1) {
-      const otherUser = room.roomPhoto.find(
-        (imgObj) => imgObj.userID !== userData.userID
-      );
-      return otherUser?.image || "";
-    } else {
-      return room.roomPhoto[0]?.image || "";
-    }
-  }
 
   return (
     <div className="w-full h-screen bg-gray-600 text-white flex flex-col">
@@ -142,6 +87,7 @@ function App() {
         <aside className="w-20 min-w-[60px] bg-slate-950"></aside>
 
         <aside
+          id="resizableSidebar"
           className={`h-full bg-slate-700 rounded-lg flex flex-col border-r-2 border-t-2 border-slate-600 ${
             isDragging.current ? "" : "transition-all duration-200 ease-in-out"
           }`}
@@ -170,28 +116,10 @@ function App() {
                     socket={socket}
                     click={click}
                     roomCardCreationTime={roomCardCreationTime}
-                    roomPhoto={
-                      data.roomPhoto.length > 1
-                        ? data.roomPhoto.find(
-                            (imgObj) => imgObj.userID !== userData.userID
-                          )?.image
-                        : data.roomPhoto[0]?.image || ""
-                    }
-                    roomTitle={
-                      Array.isArray(data.roomTitle)
-                        ? data.roomTitle
-                            .filter((title) => title !== userData.userName)
-                            .join(", ")
-                        : data.roomTitle || ""
-                    }
-                    timeStamps={
-                      new Date(
-                        data?.messages[data?.messages.length - 1]?.createdAt
-                      ) || data.createdAt
-                    }
-                    unseenMessage={
-                      data?.messages[data?.messages.length - 1]?.message || ""
-                    }
+                    roomPhoto={RoomPhotoFinder(data, userData)}
+                    roomTitle={RoomTitleFinder(data, userData)}
+                    timeStamps={TimeFinder(data)}
+                    unseenMessage={UnseenMessageFinder(data)}
                   />
                 );
               })
@@ -204,7 +132,9 @@ function App() {
         </aside>
 
         <div
-          onMouseDown={startDragging}
+          onMouseDown={(e) =>
+            startDragging(e, isDragging, startX, startWidth, setSidebarWidth)
+          }
           onMouseEnter={(e) => (e.target.style.backgroundColor = "#94a3b8")}
           onMouseLeave={(e) => (e.target.style.backgroundColor = "#64748b")}
           style={{
@@ -223,7 +153,7 @@ function App() {
               userID={userData.userID}
               socket={socket}
               click={click}
-              messages={Roomfinder().messages}
+              messages={Roomfinder(userHistory, click).messages}
               roomType={click.roomType}
               roomName={click.roomName}
               roomPhoto={click.roomPhoto}

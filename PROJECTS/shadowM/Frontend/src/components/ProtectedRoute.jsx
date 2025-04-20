@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Navigate } from "react-router-dom";
-import { addUserData, getAllUserData, deleteUserData } from "../../utils/db.js";
+// import { addUserData, getAllUserData, deleteUserData } from "../../utils/db.js";
 
 const ProtectedRoute = ({ children }) => {
   let user = null;
