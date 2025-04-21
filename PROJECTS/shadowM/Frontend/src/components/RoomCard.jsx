@@ -26,7 +26,6 @@ function RoomCard({
   const [displayCurrentMessageTime, setDisplayCurrentMessageTime] =
     useState(timeStamps);
   const [messageStatus, setMessageStatus] = useState("OLD");
-  const [newMessageStatus, setNewMessageStatus] = useState(false);
 
   const isNewer = isNewerMessage(
     click,
@@ -47,7 +46,6 @@ function RoomCard({
       }
     });
     socket.on("unseenMessage", (data) => {
-      setNewMessageStatus((prev) => ({ ...prev, status: data.status }));
     });
   }, []);
 
@@ -55,7 +53,6 @@ function RoomCard({
     <div
       onClick={() => {
         const previosRoomName = click.roomName;
-        setNewMessageStatus((prev) => ({ ...prev, status: !prev.status }));
         setClick((prevData) => ({
           clickStatus: findClickStatus(prevData, roomName),
           roomType: roomType,
