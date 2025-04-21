@@ -45,9 +45,11 @@ function RoomCard({
         setMessageStatus((prev) => (prev != "NEW" ? "NEW" : prev));
       }
     });
-    socket.on("unseenMessage", (data) => {
-    });
   }, []);
+
+  function isClickedR() {
+    return click.roomName === roomName ? true : false;
+  }
 
   return (
     <div
@@ -66,11 +68,13 @@ function RoomCard({
           [previosRoomName]: Date.now(),
         }));
       }}
-      draggable="true"
-      className="w-full h-20 bg-slate-900 border-b-2 border-b-slate-500 flex rounded-lg overflow-hidden container"
+      className="select-none w-full h-20 bg-slate-900 border-b-2 border-b-slate-500 flex rounded-lg overflow-hidden container"
     >
       <div className="space_div w-[8px] h-full flex items-center ml-1.5">
-        <div className="w-full h-[35%] bg-lime-500 rounded-full"></div>
+        <div
+          className={`w-full h-[35%]  rounded-full transform transition-transform duration-500 ease-in-out 
+              ${isClickedR() ? "translate-y-0 bg-lime-500" : "translate-y-24"}`}
+        ></div>
       </div>
       <div className="room_photo pl-1.5 w-[97px] h-full flex items-center justify-center relative">
         <div className="room_metadata w-[57px] h-[57px] bg-black rounded-full overflow-clip">

@@ -18,10 +18,19 @@ function Login() {
     }
     // response.data.img
     try {
-      let response = await axios.post("http://localhost:3000/api/v1/login", {
-        userEmail: email,
-        userPassword: password,
-      });
+      let response = await axios.post(
+        "http://localhost:3000/api/v1/login",
+        {
+          userEmail: email,
+          userPassword: password,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        }
+      );
 
       // response.data = {
       //   userID: "",

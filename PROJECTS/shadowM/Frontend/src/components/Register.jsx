@@ -34,10 +34,9 @@ function Register() {
           headers: {
             "Content-Type": "application/json",
           },
+          withCredentials: true,
         }
       );
-
-      // console.log("data of requested ====>", response);
 
       if (!response.data.success) {
         alert(response.data.error);
@@ -47,7 +46,7 @@ function Register() {
         Navigate("/");
       }
     } catch (err) {
-      console.log("Login error =>", err);
+      console.log("Register error =>", err);
       alert("Invalid login credentials. Please try again.");
     }
   }

@@ -49,6 +49,13 @@ export const handleLogin = async (req, res) => {
 export const handleRegister = async (req, res) => {
   const { userName, userEmail, userPassword, userImage } = req.body;
 
+  if (!userName || !userEmail || !userPassword || !userImage) {
+    return res.status(400).json({
+      success: false,
+      error: "All fields are reequired",
+    });
+  }
+
   let salt = await bcrypt.genSalt();
   let hashPassword = await bcrypt.hash(userPassword, salt);
 
