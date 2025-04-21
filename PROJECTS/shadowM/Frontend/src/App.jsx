@@ -41,7 +41,8 @@ function App() {
     roomTitle: "",
   });
 
-  let [roomCardCreationTime, setLastClickToRoomCard] = useState(Date.now());
+  const [roomLastSeenMap, setRoomLastSeenMap] = useState({});
+
   const [sidebarWidth, setSidebarWidth] = useState(320);
   const isDragging = useRef(false);
   const startX = useRef(0);
@@ -115,7 +116,9 @@ function App() {
                     roomName={data.roomName}
                     socket={socket}
                     click={click}
-                    roomCardCreationTime={roomCardCreationTime}
+                    userID={userData.userID}
+                    roomLastSeenMap={roomLastSeenMap}
+                    setRoomLastSeenMap={setRoomLastSeenMap}
                     roomPhoto={RoomPhotoFinder(data, userData)}
                     roomTitle={RoomTitleFinder(data, userData)}
                     timeStamps={TimeFinder(data)}
@@ -158,7 +161,7 @@ function App() {
               roomName={click.roomName}
               roomPhoto={click.roomPhoto}
               roomTitle={click.roomTitle}
-              setLastClickToRoomCard={setLastClickToRoomCard}
+              setRoomLastSeenMap={setRoomLastSeenMap}
             />
           ) : (
             <h1>welcome user</h1>

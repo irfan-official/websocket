@@ -78,6 +78,11 @@ const handleSocket = (socket, io) => {
       roomName: roomName,
       message: message,
       time: saveMessage.createdAt,
+      userID: senderID,
+    });
+
+    io.to(roomName).emit("unseenMessage", {
+      status: true,
     });
   });
 

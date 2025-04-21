@@ -34,11 +34,22 @@ export function formatTime(dateValue) {
     return "";
   }
 }
-
-export function isNewerMessage(click, roomName, creationTime, messageTime) {
+export function isNewerMessage(
+  click,
+  roomName,
+  roomLastSeenMap,
+  displayCurrentMessageTime,
+  userID,
+  latestMessageSender
+) {
   try {
-    if (roomName !== click.roomName) {
-      return new Date(creationTime).getTime() < new Date(messageTime).getTime();
+    if (userID === latestMessageSender) {
+      return false;
+    }
+    if (click.roomName != roomName) {
+      const lastSeenTime = roomLastSeenMap[roomName] || 0;
+      const messageTime = new Date(displayCurrentMessageTime).getTime();
+      return lastSeenTime < messageTime;
     }
     return false;
   } catch {

@@ -14,7 +14,7 @@ function RoomMessage({
   roomName,
   roomPhoto,
   roomTitle,
-  setLastClickToRoomCard,
+  setRoomLastSeenMap,
 }) {
   let [scrollBehave, setScrollBehave] = useState("auto");
   let [clientMessage, setClientMessage] = useState("");
@@ -30,7 +30,11 @@ function RoomMessage({
       roomName,
     };
     socket.emit("roomEnter", data);
-    setLastClickToRoomCard(Date.now());
+
+    setRoomLastSeenMap((prev) => ({
+      ...prev,
+      [roomName]: Date.now(),
+    }));
   }, [click]);
 
   useEffect(() => {

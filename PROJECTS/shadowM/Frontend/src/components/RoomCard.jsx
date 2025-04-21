@@ -10,6 +10,7 @@ import {
 function RoomCard({
   socket,
   click,
+  userID,
   setClick,
   roomType,
   roomName,
@@ -17,39 +18,57 @@ function RoomCard({
   roomTitle,
   timeStamps,
   unseenMessage,
-  roomCardCreationTime,
+  roomLastSeenMap,
+  setRoomLastSeenMap,
 }) {
   const [latestMessage, setLatestMessage] = useState(unseenMessage);
+  const [latestMessageSender, setLatestMessageSender] = useState(unseenMessage);
   const [displayCurrentMessageTime, setDisplayCurrentMessageTime] =
     useState(timeStamps);
+  const [messageStatus, setMessageStatus] = useState("OLD");
+  const [newMessageStatus, setNewMessageStatus] = useState(false);
 
   const isNewer = isNewerMessage(
     click,
     roomName,
-    roomCardCreationTime,
-    displayCurrentMessageTime
+    roomLastSeenMap,
+    displayCurrentMessageTime,
+    userID, // NEW PARAM!
+    latestMessageSender
   );
 
   useEffect(() => {
     socket.on("latestMessage", (data) => {
       if (data.roomName === roomName) {
+        setLatestMessageSender(data.userID);
         setLatestMessage(data.message);
         setDisplayCurrentMessageTime(data.time);
+        setMessageStatus((prev) => (prev != "NEW" ? "NEW" : prev));
       }
+    });
+    socket.on("unseenMessage", (data) => {
+      setNewMessageStatus((prev) => ({ ...prev, status: data.status }));
     });
   }, []);
 
   return (
     <div
-      onClick={() =>
+      onClick={() => {
+        const previosRoomName = click.roomName;
+        setNewMessageStatus((prev) => ({ ...prev, status: !prev.status }));
         setClick((prevData) => ({
           clickStatus: findClickStatus(prevData, roomName),
           roomType: roomType,
           roomName: findRoomName(prevData, roomName),
           roomPhoto: roomPhoto,
           roomTitle: roomTitle,
-        }))
-      }
+        }));
+        setRoomLastSeenMap((prev) => ({
+          ...prev,
+          [roomName]: Date.now(),
+          [previosRoomName]: Date.now(),
+        }));
+      }}
       draggable="true"
       className="w-full h-20 bg-slate-900 border-b-2 border-b-slate-500 flex rounded-lg overflow-hidden container"
     >
@@ -68,7 +87,11 @@ function RoomCard({
           </div>
           <div
             className={`time flex items-center w-[25%] h-[90%] justify-center ${
-              isNewer ? "font-bold" : ""
+              messageStatus != "OLD"
+                ? isNewer
+                  ? "text-orange-500 font-semibold"
+                  : ""
+                : ""
             }`}
           >
             <h6 className="text-[0.7rem]">
@@ -78,10 +101,12 @@ function RoomCard({
         </div>
         <div className="bottom_ w-full h-[40%] flex items-center justify-start pl-2.5">
           <h5
-            className={` ${
-              isNewer
-                ? "text-white font-bold text-[0.8rem]"
-                : "text-white font-normal text-[0.7rem]"
+            className={`text-[0.7rem] ${
+              messageStatus != "OLD"
+                ? isNewer
+                  ? "text-orange-500 font-semibold"
+                  : "text-white font-normal"
+                : ""
             }`}
           >
             {editMessage(latestMessage)}
