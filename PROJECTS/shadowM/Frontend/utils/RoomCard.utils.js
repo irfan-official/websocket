@@ -19,7 +19,7 @@ export function findClickStatus(prevData, roomName) {
 }
 
 export function findRoomName(prevData, roomName) {
-  return prevData.roomName === roomName ? !prevData.roomName : roomName;
+  return prevData.roomName === roomName ? prevData.roomName : roomName;
 }
 
 export function formatTime(dateValue) {
